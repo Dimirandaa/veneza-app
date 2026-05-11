@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Associação Veneza</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600;700;900&family=Barlow+Condensed:wght@700;900&display=swap" rel="stylesheet">
+<style>
+:root{--y:#F5C400;--yd:#C49A00;--blk:#111111;--wht:#FFFFFF;--gray:#F4F4F4;--mgray:#777;--border:#E8E8E8;--green:#22C55E;--red:#EF4444;--font:'Barlow',sans-serif;--font-d:'Barlow Condensed',sans-serif}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--blk);min-height:100vh;display:flex;align-items:center;justify-content:center}
+.app{width:100%;max-width:420px;min-height:100vh;background:var(--wht);display:flex;flex-direction:column;position:relative;overflow:hidden}
+.screen{display:none;flex-direction:column;min-height:100vh}.screen.active{display:flex}
+.topbar{background:var(--blk);padding:16px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.topbar-logo{font-family:var(--font-d);font-size:20px;font-weight:900;color:var(--y);letter-spacing:1px}
+.topbar-title{color:var(--wht);font-size:15px;font-weight:600;flex:1}
+.topbar-back{color:var(--y);font-size:13px;font-weight:600;cursor:pointer;background:none;border:none;padding:4px 0}
+.hero{background:var(--y);padding:28px 20px 24px;position:relative;overflow:hidden}
+.hero::after{content:'V';font-family:var(--font-d);font-size:140px;font-weight:900;color:rgba(0,0,0,0.06);position:absolute;right:-10px;top:-20px;line-height:1}
+.hero h1{font-family:var(--font-d);font-size:28px;font-weight:900;color:var(--blk);line-height:1.1}
+.hero p{font-size:13px;color:#444;margin-top:4px}
+.content{flex:1;padding:16px 20px;overflow-y:auto;background:#F7F7F7}
+.section-title{font-size:10px;font-weight:700;color:var(--mgray);letter-spacing:.1em;text-transform:uppercase;margin:16px 0 8px}
+.section-title:first-child{margin-top:0}
+.card{background:var(--wht);border-radius:14px;border:1px solid var(--border);padding:14px 16px;margin-bottom:10px}
+.card-title{font-size:14px;font-weight:700;color:var(--blk);margin-bottom:2px}
+.card-sub{font-size:12px;color:var(--mgray)}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:6px}
+.badge-green{background:#DCFCE7;color:#166534}.badge-red{background:#FEE2E2;color:#991B1B}.badge-yellow{background:#FEF9C3;color:#854D0E}
+.btn{width:100%;padding:14px;border-radius:12px;font-family:var(--font);font-size:15px;font-weight:700;cursor:pointer;border:none;transition:transform .1s,opacity .1s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn:active{transform:scale(.97);opacity:.9}.btn+.btn{margin-top:8px}
+.btn-primary{background:var(--y);color:var(--blk)}.btn-outline{background:var(--wht);color:var(--blk);border:2px solid var(--blk)}
+.btn-wpp{background:#25D366;color:var(--wht)}.btn-danger{background:#EF4444;color:var(--wht)}
+.btn-sm{padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--wht);color:var(--blk)}
+.btn-sm.yellow{background:var(--y);border-color:var(--y);color:var(--blk)}
+.tabs{display:flex;background:var(--blk);flex-shrink:0}
+.tab{flex:1;padding:10px 2px;text-align:center;font-size:10px;font-weight:600;color:#666;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;background:none;border-top:none;border-left:none;border-right:none}
+.tab.active{color:var(--y);border-bottom:2px solid var(--y)}
+.field{margin-bottom:12px}
+.field label{display:block;font-size:11px;font-weight:700;color:var(--blk);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+.field input,.field select{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;font-family:var(--font);background:var(--wht);color:var(--blk);transition:border-color .2s}
+.field input:focus,.field select:focus{outline:none;border-color:var(--y)}
+.field .hint{font-size:11px;color:var(--mgray);margin-top:4px}
+.field .hint.error{color:var(--red)}.field .hint.ok{color:#166534}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.stat{background:var(--wht);border-radius:12px;border:1px solid var(--border);padding:14px}
+.stat-val{font-family:var(--font-d);font-size:28px;font-weight:900;color:var(--blk);line-height:1}
+.stat-lbl{font-size:11px;color:var(--mgray);margin-top:3px}.stat-icon{font-size:20px;margin-bottom:6px}
+.projeto-card{background:var(--wht);border-radius:14px;border:1.5px solid var(--border);padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .2s,transform .1s}
+.projeto-card:active{transform:scale(.99)}.projeto-card:hover{border-color:var(--y)}
+.progress-bar{height:5px;background:#EEE;border-radius:4px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px;transition:width .4s}
+.row-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
+.row-item:last-child{border-bottom:none}
+.avatar{width:38px;height:38px;border-radius:50%;background:var(--y);color:var(--blk);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.notice{background:#FEF9C3;border:1px solid #F5C400;border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.notice p{font-size:12px;color:#713F12;line-height:1.5}
+.modo-banner{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;margin-bottom:12px;font-size:11px;font-weight:600}
+.modo-local{background:#EFF6FF;color:#1D4ED8;border:1px solid #BFDBFE}
+.modo-firebase{background:#F0FDF4;color:#166534;border:1px solid #BBF7D0}
+.success-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;background:#F7F7F7}
+.success-icon{width:72px;height:72px;background:var(--y);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin-bottom:20px}
+.login-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;background:var(--blk)}
+.login-logo{font-family:var(--font-d);font-size:52px;font-weight:900;color:var(--y);letter-spacing:4px;margin-bottom:8px}
+.login-sub{color:#666;font-size:13px;margin-bottom:32px}
+.login-screen .field label{color:#aaa}
+.login-screen .field input{background:#1a1a1a;border-color:#333;color:var(--wht)}
+.login-screen .field input:focus{border-color:var(--y)}
+.login-screen .field .hint{color:#666}
+.login-screen .field .hint.error{color:#f87171}.login-screen .field .hint.ok{color:#4ade80}
+.loader{display:none;position:absolute;inset:0;background:rgba(255,255,255,.85);z-index:100;align-items:center;justify-content:center;flex-direction:column;gap:12px}
+.loader.show{display:flex}
+.spinner{width:36px;height:36px;border:3px solid #EEE;border-top-color:var(--y);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:absolute;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--blk);color:var(--wht);padding:10px 20px;border-radius:24px;font-size:13px;font-weight:600;transition:transform .3s;white-space:nowrap;z-index:200;max-width:90%}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.presenca-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:8px}
+.presenca-dia{width:100%;aspect-ratio:1;border-radius:4px;background:#EEE;cursor:pointer;border:none;transition:background .15s;font-size:9px;color:#999;display:flex;align-items:center;justify-content:center}
+.presenca-dia.presente{background:var(--y);color:var(--blk);font-weight:700}
+.presenca-dia.falta{background:#FEE2E2;color:#991B1B}
+@media(max-width:420px){body{align-items:flex-start}.app{min-height:100dvh}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="loader" id="loader"><div class="spinner"></div><p style="font-size:13px;color:#888">Aguarde...</p></div>
+  <div class="toast" id="toast"></div>
+
+  <!-- ══ HOME ══ -->
+  <div class="screen active" id="s-home">
+    <div class="topbar">
+      <div class="topbar-logo">VENEZA</div>
+      <span class="topbar-title">Associação Veneza</span>
+      <button class="topbar-back" onclick="go('s-login')" style="font-size:11px;opacity:.6">Admin</button>
+    </div>
+    <div class="hero"><h1>Faça parte do<br>Veneza!</h1><p>Jardim Itajaí · São Paulo · Gratuito</p></div>
+    <div class="content">
+      <div class="notice"><p>✅ Todos os projetos são <strong>100% gratuitos</strong> e voluntários. Basta se inscrever!</p></div>
+      <button class="btn btn-primary" onclick="go('s-projetos')">Ver projetos e se inscrever</button>
+      <button class="btn btn-outline" onclick="go('s-cadastro-geral')">Só quero me cadastrar</button>
+      <div class="section-title">Próximos eventos</div>
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="card-title">🎪 Arraial do Veneza</div><div class="card-sub">13 e 14 de junho · Campo do Veneza</div></div><span class="badge badge-yellow">Em breve</span></div></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="card-title">⭐ Dia das Crianças</div><div class="card-sub">Outubro · Sede da Associação</div></div><span class="badge badge-green">Confirmado</span></div></div>
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="card-title">☕ Café de Natal</div><div class="card-sub">Dezembro · Sede da Associação</div></div><span class="badge badge-green">Confirmado</span></div></div>
+    </div>
+  </div>
+
+  <!-- ══ PROJETOS ══ -->
+  <div class="screen" id="s-projetos">
+    <div class="topbar"><button class="topbar-back" onclick="go('s-home')">← voltar</button><span class="topbar-title">Projetos disponíveis</span></div>
+    <div class="content" id="lista-projetos"></div>
+  </div>
+
+  <!-- ══ CADASTRO GERAL ══ -->
+  <div class="screen" id="s-cadastro-geral">
+    <div class="topbar"><button class="topbar-back" onclick="go('s-home')">← voltar</button><span class="topbar-title">Cadastro</span></div>
+    <div class="content">
+      <div class="section-title">Seus dados</div>
+      <div class="field"><label>Nome completo *</label><input type="text" id="cg-nome" placeholder="Ex: Maria Silva"></div>
+      <div class="field"><label>Data de nascimento *</label><input type="date" id="cg-nasc"></div>
+      <div class="field"><label>WhatsApp *</label><input type="tel" id="cg-tel" placeholder="(11) 99999-9999"></div>
+      <div class="field"><label>Responsável (se menor)</label><input type="text" id="cg-resp" placeholder="Nome do responsável"></div>
+      <div class="field"><label>Projeto de interesse</label>
+        <select id="cg-proj"><option value="">Selecionar depois</option><option>Balé</option><option>Capoeira</option><option>Muay Thai</option><option>Reforço Escolar</option><option>Dança ao ar livre</option><option>Brincar e Desenvolver</option></select>
+      </div>
+      <button class="btn btn-primary" onclick="salvarCadastroGeral()">Confirmar cadastro</button>
+    </div>
+  </div>
+
+  <!-- ══ INSCRIÇÃO ══ -->
+  <div class="screen" id="s-inscricao">
+    <div class="topbar"><button class="topbar-back" onclick="go('s-projetos')">← voltar</button><span class="topbar-title">Inscrição</span></div>
+    <div class="content">
+      <div class="card" id="inscricao-info" style="border-color:#F5C400;border-width:1.5px"></div>
+      <div class="section-title">Seus dados</div>
+      <div class="field"><label>Nome completo *</label><input type="text" id="i-nome" placeholder="Ex: João Silva"></div>
+      <div class="field"><label>Data de nascimento *</label><input type="date" id="i-nasc"></div>
+      <div class="field"><label>WhatsApp *</label><input type="tel" id="i-tel" placeholder="(11) 99999-9999"></div>
+      <div class="field"><label>Responsável (se menor de 18)</label><input type="text" id="i-resp" placeholder="Nome do responsável"></div>
+      <button class="btn btn-primary" onclick="salvarInscricao()">Garantir minha vaga</button>
+      <p style="font-size:11px;color:#999;text-align:center;margin-top:10px">Você será direcionado ao WhatsApp para confirmação</p>
+    </div>
+  </div>
+
+  <!-- ══ CONFIRMAÇÃO ══ -->
+  <div class="screen" id="s-confirmacao">
+    <div class="topbar"><div class="topbar-logo">VENEZA</div></div>
+    <div class="success-screen">
+      <div class="success-icon">✅</div>
+      <h2 style="font-family:var(--font-d);font-size:24px;font-weight:900;margin-bottom:8px">Cadastro salvo!</h2>
+      <p style="font-size:13px;color:#666;margin-bottom:6px;line-height:1.6" id="modo-salvo-info"></p>
+      <p style="font-size:13px;color:#666;margin-bottom:28px;line-height:1.6">Agora fale com o responsável para confirmar sua vaga.</p>
+      <button class="btn btn-wpp" id="btn-wpp-confirma" style="max-width:320px">📱 Falar no WhatsApp</button>
+      <button class="btn btn-outline" onclick="go('s-home')" style="max-width:320px;margin-top:8px">Voltar ao início</button>
+    </div>
+  </div>
+
+  <!-- ══ LOGIN ADMIN ══ -->
+  <div class="screen" id="s-login">
+    <div class="login-screen">
+      <div class="login-logo">VENEZA</div>
+      <p class="login-sub">Acesso administrativo</p>
+      <div style="width:100%;max-width:320px">
+        <div class="field"><label>Usuário</label><input type="text" id="login-user" placeholder="admin" autocomplete="username"></div>
+        <div class="field">
+          <label>Senha</label>
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')fazerLogin()">
+        </div>
+        <button class="btn btn-primary" onclick="fazerLogin()">Entrar</button>
+        <button class="btn" onclick="go('s-recuperar')" style="background:none;color:#F5C400;font-size:13px;margin-top:8px">Esqueci minha senha</button>
+        <button class="btn" onclick="go('s-home')" style="background:none;color:#555;font-size:13px;margin-top:4px">← Voltar ao app</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ RECUPERAR SENHA ══ -->
+  <div class="screen" id="s-recuperar">
+    <div class="topbar"><button class="topbar-back" onclick="go('s-login')">← voltar</button><span class="topbar-title">Recuperar senha</span></div>
+    <div class="content" style="background:var(--blk);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:500px">
+      <div style="width:100%;max-width:320px">
+        <div style="text-align:center;margin-bottom:24px">
+          <div style="font-size:40px;margin-bottom:12px">🔐</div>
+          <p style="color:#aaa;font-size:13px;line-height:1.6">Um token de recuperação será enviado para o e-mail administrativo cadastrado.</p>
+        </div>
+        <div class="field"><label style="color:#aaa">E-mail administrativo</label>
+          <input type="email" id="rec-email" placeholder="seu@email.com" style="background:#1a1a1a;border-color:#333;color:#fff">
+        </div>
+        <button class="btn btn-primary" onclick="enviarToken()">Enviar token de recuperação</button>
+        <div id="rec-status" style="margin-top:12px;font-size:12px;color:#aaa;text-align:center"></div>
+        <div id="s-token-form" style="display:none;margin-top:20px">
+          <div class="field"><label style="color:#aaa">Token recebido no e-mail</label>
+            <input type="text" id="rec-token" placeholder="Ex: 483921" style="background:#1a1a1a;border-color:#333;color:#fff;letter-spacing:4px;font-size:18px;text-align:center">
+          </div>
+          <div class="field"><label style="color:#aaa">Nova senha</label>
+            <input type="password" id="rec-nova-senha" placeholder="Mín. 8 chars, 1 maiúscula, 1 número" style="background:#1a1a1a;border-color:#333;color:#fff" oninput="validarSenhaInput('rec-nova-senha','rec-senha-hint')">
+            <div class="hint" id="rec-senha-hint"></div>
+          </div>
+          <button class="btn btn-primary" onclick="confirmarToken()">Redefinir senha</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ ALTERAR SENHA ══ -->
+  <div class="screen" id="s-alterar-senha">
+    <div class="topbar"><button class="topbar-back" onclick="adminTab('config')">← voltar</button><span class="topbar-title">Alterar senha</span></div>
+    <div class="content">
+      <div class="notice"><p>🔒 A senha deve ter no mínimo <strong>8 caracteres</strong>, pelo menos <strong>1 letra maiúscula</strong> e <strong>1 número</strong>.</p></div>
+      <div class="field"><label>Senha atual</label><input type="password" id="as-atual" placeholder="••••••••"></div>
+      <div class="field">
+        <label>Nova senha</label>
+        <input type="password" id="as-nova" placeholder="Ex: Veneza2025" oninput="validarSenhaInput('as-nova','as-hint')">
+        <div class="hint" id="as-hint"></div>
+      </div>
+      <div class="field"><label>Confirmar nova senha</label><input type="password" id="as-confirma" placeholder="Repita a nova senha"></div>
+      <button class="btn btn-primary" onclick="alterarSenha()">Salvar nova senha</button>
+    </div>
+  </div>
+
+  <!-- ══ PAINEL ADMIN ══ -->
+  <div class="screen" id="s-admin">
+    <div class="topbar">
+      <div class="topbar-logo">VENEZA</div>
+      <span class="topbar-title">Painel admin</span>
+      <button class="topbar-back" onclick="fazerLogout()" style="font-size:11px">Sair</button>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="adminTab('dash')" id="t-dash">Painel</button>
+      <button class="tab" onclick="adminTab('inscritos')" id="t-inscritos">Inscritos</button>
+      <button class="tab" onclick="adminTab('presenca')" id="t-presenca">Presença</button>
+      <button class="tab" onclick="adminTab('espera')" id="t-espera">Espera</button>
+      <button class="tab" onclick="adminTab('config')" id="t-config">Config</button>
+    </div>
+    <div class="content" id="admin-content"></div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<!-- EmailJS -->
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<script>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ⚙️  CONFIGURAÇÕES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const WHATSAPP_ADMIN = "5511993687348";
+
+// Admin — credenciais salvas no localStorage após primeiro acesso
+const ADMIN_DEFAULT = { user: "veneza", pass: "Veneza2024", email: "diego.cmirnada@hotmail.com" };
+
+// EmailJS — cadastre-se em emailjs.com e cole as chaves abaixo
+// Instruções completas no arquivo COMO_PUBLICAR.txt
+const EMAILJS = {
+  publicKey:  "COLE_AQUI",   // Account > API Keys
+  serviceId:  "COLE_AQUI",   // Email Services > Service ID
+  templateRecuperacao: "COLE_AQUI",  // Email Templates > Template ID (recuperação)
+  templateRelatorio:   "COLE_AQUI",  // Email Templates > Template ID (relatório mensal)
+};
+
+// Firebase — cole quando criar o projeto
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDtsC9yAnet9YqUPYYzjOwbkA_slN9rqG4",
+  authDomain: "veneza-app.firebaseapp.com",
+  projectId: "veneza-app",
+  storageBucket: "veneza-app.appspot.com",
+  messagingSenderId: "253744271388",
+  appId: "1:253744271388:web:5db6ebe9735af707100fd9"
+};
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📦  PROJETOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+const PROJETOS = [
+  {id:"bale",    nome:"Balé",                 icon:"🩰",horario:"Seg e Qua · 14h–15h30",  vagas:50,ocupadas:50,publico:"Crianças 6–14 anos"},
+  {id:"capoeira",nome:"Capoeira",              icon:"🥋",horario:"Ter e Qui · 15h–16h30",  vagas:30,ocupadas:24,publico:"Crianças e adolescentes"},
+  {id:"muaythai",nome:"Muay Thai",             icon:"🥊",horario:"Seg, Qua e Sex · 16h",   vagas:20,ocupadas:12,publico:"Crianças e adolescentes"},
+  {id:"reforco", nome:"Reforço Escolar",       icon:"📚",horario:"Qui · 14h–15h30",        vagas:12,ocupadas:12,publico:"Crianças 6–14 anos"},
+  {id:"danca",   nome:"Dança ao ar livre",     icon:"💃",horario:"Sex · 19h",              vagas:40,ocupadas:30,publico:"Mulheres de todas as idades"},
+  {id:"brincar", nome:"Brincar e Desenvolver", icon:"🧠",horario:"Após aula de Balé",      vagas:20,ocupadas:15,publico:"Crianças do Balé"},
+];
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🔌  BANCO DE DADOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+let db = null, MODO = "local";
+const fbOk = Object.values(FIREBASE_CONFIG).every(v => v !== "COLE_AQUI");
+if (fbOk) {
+  try {
+    firebase.initializeApp(FIREBASE_CONFIG);
+    db = firebase.firestore();
+    MODO = "firebase";
+    console.log("✅ Firebase conectado");
+  } catch(e) {
+    console.warn("⚠️ Firebase falhou:", e.message);
+    MODO = "local";
+  }
+}
+
+const LS = {
+  get:(k)=>{ try{ return JSON.parse(localStorage.getItem("vz_"+k))||[]; }catch(e){ return []; }},
+  set:(k,d)=>{ try{ localStorage.setItem("vz_"+k,JSON.stringify(d)); }catch(e){} },
+  getObj:(k,def)=>{ try{ return JSON.parse(localStorage.getItem("vz_"+k))||def; }catch(e){ return def; }},
+  setObj:(k,d)=>{ try{ localStorage.setItem("vz_"+k,JSON.stringify(d)); }catch(e){} },
+  add:(col,reg)=>{ reg.id=Date.now().toString(); const d=LS.get(col); d.unshift(reg); LS.set(col,d); return reg; }
+};
+
+async function dbAdd(col,reg){
+  if(MODO==="firebase"){ const r=await db.collection(col).add(reg); return {id:r.id,...reg}; }
+  return LS.add(col,reg);
+}
+async function dbGetAll(col){
+  if(MODO==="firebase"){
+    try{ const s=await db.collection(col).orderBy("timestamp","desc").get(); return s.docs.map(d=>({id:d.id,...d.data()})); }
+    catch(e){ return LS.get(col); }
+  }
+  return LS.get(col);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   👤  ADMIN CONFIG
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function getAdmin(){ return LS.getObj("admin_config", ADMIN_DEFAULT); }
+function setAdmin(cfg){ LS.setObj("admin_config", cfg); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🔐  VALIDAÇÃO DE SENHA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function senhaValida(s){
+  return s.length >= 8 && /[A-Z]/.test(s) && /[0-9]/.test(s);
+}
+function validarSenhaInput(inputId, hintId){
+  const s = document.getElementById(inputId).value;
+  const h = document.getElementById(hintId);
+  if(!s){ h.textContent=""; h.className="hint"; return; }
+  const erros = [];
+  if(s.length < 8) erros.push("mínimo 8 caracteres");
+  if(!/[A-Z]/.test(s)) erros.push("1 letra maiúscula");
+  if(!/[0-9]/.test(s)) erros.push("1 número");
+  if(erros.length){ h.textContent="Faltando: "+erros.join(", "); h.className="hint error"; }
+  else{ h.textContent="✓ Senha válida"; h.className="hint ok"; }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🔑  TOKEN DE RECUPERAÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+let tokenAtivo = null, tokenEmail = null;
+
+async function enviarToken(){
+  const email = document.getElementById("rec-email").value.trim();
+  const admin = getAdmin();
+  if(!email){ showToast("⚠️ Informe o e-mail"); return; }
+  if(email.toLowerCase() !== admin.email.toLowerCase()){
+    document.getElementById("rec-status").textContent = "❌ E-mail não corresponde ao cadastro administrativo.";
+    return;
+  }
+  tokenAtivo = Math.floor(100000 + Math.random() * 900000).toString();
+  tokenEmail = email;
+  const expira = Date.now() + 15 * 60 * 1000; // 15 minutos
+  LS.setObj("rec_token", { token: tokenAtivo, expira });
+
+  const emailjsOk = Object.values(EMAILJS).every(v => v !== "COLE_AQUI");
+  if(emailjsOk){
+    try{
+      emailjs.init(EMAILJS.publicKey);
+      await emailjs.send(EMAILJS.serviceId, EMAILJS.templateRecuperacao, {
+        to_email: email,
+        token: tokenAtivo,
+        expira_em: "15 minutos"
+      });
+      document.getElementById("rec-status").innerHTML = `✅ Token enviado para <strong>${email}</strong>. Válido por 15 minutos.`;
+    }catch(e){
+      document.getElementById("rec-status").textContent = `⚠️ E-mail não enviado (EmailJS não configurado). Token para teste: ${tokenAtivo}`;
+    }
+  } else {
+    // Modo teste — exibe o token na tela
+    document.getElementById("rec-status").innerHTML = `📱 <strong>Modo teste:</strong> Token gerado: <strong style="color:#F5C400;font-size:18px;letter-spacing:4px">${tokenAtivo}</strong><br><small style="color:#666">(Configure o EmailJS para envio real)</small>`;
+  }
+  document.getElementById("s-token-form").style.display = "block";
+}
+
+async function confirmarToken(){
+  const tokenDigitado = document.getElementById("rec-token").value.trim();
+  const novaSenha = document.getElementById("rec-nova-senha").value;
+  const salvo = LS.getObj("rec_token", {});
+
+  if(!tokenDigitado || !novaSenha){ showToast("⚠️ Preencha o token e a nova senha"); return; }
+  if(Date.now() > salvo.expira){ showToast("❌ Token expirado. Solicite um novo."); return; }
+  if(tokenDigitado !== salvo.token){ showToast("❌ Token incorreto"); return; }
+  if(!senhaValida(novaSenha)){ showToast("⚠️ Senha não atende aos requisitos"); return; }
+
+  const admin = getAdmin();
+  setAdmin({...admin, pass: novaSenha});
+  LS.setObj("rec_token", {});
+  tokenAtivo = null;
+  showToast("✅ Senha redefinida com sucesso!");
+  setTimeout(()=>go("s-login"), 1500);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🔄  ALTERAR SENHA (LOGADO)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function alterarSenha(){
+  const atual    = document.getElementById("as-atual").value;
+  const nova     = document.getElementById("as-nova").value;
+  const confirma = document.getElementById("as-confirma").value;
+  const admin = getAdmin();
+
+  if(atual !== admin.pass){ showToast("❌ Senha atual incorreta"); return; }
+  if(!senhaValida(nova)){ showToast("⚠️ Nova senha não atende aos requisitos"); return; }
+  if(nova !== confirma){ showToast("⚠️ As senhas não coincidem"); return; }
+
+  setAdmin({...admin, pass: nova});
+
+  // Envia e-mail de confirmação
+  const emailjsOk = Object.values(EMAILJS).every(v => v !== "COLE_AQUI");
+  if(emailjsOk){
+    try{
+      emailjs.init(EMAILJS.publicKey);
+      await emailjs.send(EMAILJS.serviceId, EMAILJS.templateRecuperacao, {
+        to_email: admin.email,
+        token: "Sua senha foi alterada com sucesso.",
+        expira_em: new Date().toLocaleString("pt-BR")
+      });
+    }catch(e){}
+  }
+
+  showToast("✅ Senha alterada! E-mail de confirmação enviado.");
+  ["as-atual","as-nova","as-confirma"].forEach(id=>document.getElementById(id).value="");
+  setTimeout(()=>adminTab("config"), 1500);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📧  RELATÓRIO MENSAL
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function enviarRelatorioMensal(manual=false){
+  const admin = getAdmin();
+  const [ins, esp] = await Promise.all([dbGetAll("inscritos"), dbGetAll("espera")]);
+  const presencas = LS.getObj("presencas", {});
+  const eventos = LS.getObj("eventos", []);
+  const mes = new Date().toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+  const agora = new Date().toLocaleDateString("pt-BR");
+
+  // Monta resumo de presença
+  const resumoPresenca = PROJETOS.map(p=>{
+    const presTotais = Object.values(presencas[p.id]||{}).filter(v=>v==="presente").length;
+    const faltasTotais = Object.values(presencas[p.id]||{}).filter(v=>v==="falta").length;
+    return `${p.icon} ${p.nome}: ${presTotais} presenças / ${faltasTotais} faltas`;
+  }).join("\n");
+
+  // Novos cadastros do mês
+  const inicioMes = new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
+  const novosMes = ins.filter(i=> i.timestamp && new Date(i.timestamp) >= inicioMes);
+
+  // Eventos do mês
+  const resumoEventos = eventos.length ? eventos.map(e=>`• ${e.nome} (${e.data})`).join("\n") : "Nenhum evento registrado.";
+
+  const corpoEmail = `
+RELATÓRIO MENSAL — ASSOCIAÇÃO VENEZA
+Período: ${mes}
+Gerado em: ${agora}
+Modo: ${MODO === "firebase" ? "Firebase (nuvem)" : "Local (dispositivo)"}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+📊 RESUMO GERAL
+━━━━━━━━━━━━━━━━━━━━━━━━
+Total de inscritos ativos: ${ins.length}
+Novos cadastros no mês: ${novosMes.length}
+Em lista de espera: ${esp.length}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+✅ PRESENÇA POR PROJETO
+━━━━━━━━━━━━━━━━━━━━━━━━
+${resumoPresenca}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+📅 EVENTOS DO MÊS
+━━━━━━━━━━━━━━━━━━━━━━━━
+${resumoEventos}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+👥 DISTRIBUIÇÃO POR PROJETO
+━━━━━━━━━━━━━━━━━━━━━━━━
+${PROJETOS.map(p=>`${p.icon} ${p.nome}: ${p.ocupadas}/${p.vagas} vagas`).join("\n")}
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+Associação Veneza · Jardim Itajaí · São Paulo
+  `.trim();
+
+  const emailjsOk = Object.values(EMAILJS).every(v => v !== "COLE_AQUI");
+  if(emailjsOk){
+    try{
+      emailjs.init(EMAILJS.publicKey);
+      await emailjs.send(EMAILJS.serviceId, EMAILJS.templateRelatorio, {
+        to_email: admin.email,
+        mes, relatorio: corpoEmail
+      });
+      if(manual) showToast("✅ Relatório enviado para "+admin.email);
+    }catch(e){ if(manual) showToast("⚠️ Erro ao enviar e-mail"); }
+  } else {
+    // Baixa como arquivo quando EmailJS não configurado
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(new Blob([corpoEmail],{type:"text/plain;charset=utf-8"}));
+    a.download = `relatorio-veneza-${new Date().toISOString().slice(0,7)}.txt`;
+    a.click();
+    if(manual) showToast("📄 Relatório exportado (configure EmailJS para envio automático)");
+  }
+
+  // Salva data do último envio
+  LS.setObj("ultimo_relatorio", new Date().toISOString());
+}
+
+// Verifica se deve enviar relatório automático (dia 1 de cada mês)
+function verificarRelatorioAutomatico(){
+  const ultimo = LS.getObj("ultimo_relatorio", null);
+  const agora = new Date();
+  if(agora.getDate() === 1){
+    if(!ultimo || new Date(ultimo).getMonth() !== agora.getMonth()){
+      enviarRelatorioMensal(false);
+    }
+  }
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🧭  NAVEGAÇÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+let projetoSelecionado = null;
+function go(id){ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active")); document.getElementById(id).classList.add("active"); window.scrollTo(0,0); }
+function showLoader(v){ document.getElementById("loader").classList.toggle("show",v); }
+function showToast(msg,dur=2800){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),dur); }
+function iniciais(n){ return n.trim().split(" ").map(x=>x[0]).filter(Boolean).slice(0,2).join("").toUpperCase(); }
+function calcIdade(d){ return d?Math.floor((Date.now()-new Date(d))/(1000*60*60*24*365.25)):"?"; }
+function bannerModo(){ return MODO==="firebase"?`<div class="modo-banner modo-firebase">☁️ Firebase — dados sincronizados em tempo real</div>`:`<div class="modo-banner modo-local">📱 Modo local — dados salvos neste dispositivo</div>`; }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📋  PROJETOS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function renderProjetos(){
+  const el=document.getElementById("lista-projetos");
+  el.innerHTML=`<div class="section-title">Escolha um projeto</div>`;
+  PROJETOS.forEach(p=>{
+    const livres=p.vagas-p.ocupadas,pct=Math.round(p.ocupadas/p.vagas*100),tv=livres>0;
+    const card=document.createElement("div"); card.className="projeto-card"; card.onclick=()=>selecionarProjeto(p);
+    card.innerHTML=`<div style="font-size:26px;margin-bottom:8px">${p.icon}</div>
+      <div class="card-title">${p.nome}</div><div class="card-sub">${p.horario}</div>
+      <div class="card-sub" style="margin-top:2px;font-size:11px">${p.publico}</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${tv?"var(--y)":"var(--red)"}"></div></div>
+      <div style="display:flex;justify-content:space-between;margin-top:5px;align-items:center">
+        <span style="font-size:11px;color:#888">${p.ocupadas}/${p.vagas} vagas</span>
+        ${tv?`<span class="badge badge-green">${livres} vaga${livres>1?"s":""} livre${livres>1?"s":""}</span>`:`<span class="badge badge-red">Lista de espera</span>`}
+      </div>`;
+    el.appendChild(card);
+  });
+}
+
+function selecionarProjeto(p){
+  projetoSelecionado=p;
+  const tv=p.vagas-p.ocupadas>0;
+  document.getElementById("inscricao-info").innerHTML=`
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <span style="font-size:28px">${p.icon}</span>
+      <div><div class="card-title">${p.nome}</div><div class="card-sub">${p.horario}</div></div>
+    </div>
+    ${tv?`<span class="badge badge-green">✓ Vaga disponível</span>`:`<span class="badge badge-red">Lista de espera — você será avisado quando abrir vaga</span>`}`;
+  go("s-inscricao");
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   💾  SALVAR CADASTROS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function salvarInscricao(){
+  const nome=document.getElementById("i-nome").value.trim();
+  const nasc=document.getElementById("i-nasc").value;
+  const tel=document.getElementById("i-tel").value.trim();
+  const resp=document.getElementById("i-resp").value.trim();
+  if(!nome||!nasc||!tel){showToast("⚠️ Preencha nome, nascimento e WhatsApp");return;}
+  if(!projetoSelecionado){showToast("⚠️ Nenhum projeto selecionado");return;}
+  const naFila=(projetoSelecionado.vagas-projetoSelecionado.ocupadas)<=0;
+  const reg={nome,nasc,tel,resp,projeto:projetoSelecionado.nome,projetoId:projetoSelecionado.id,naFila,status:naFila?"espera":"ativo",timestamp:new Date().toISOString(),modo:MODO};
+  showLoader(true);
+  try{ await dbAdd(naFila?"espera":"inscritos",reg); if(!naFila) projetoSelecionado.ocupadas++; showLoader(false); prepararConfirmacao(nome,projetoSelecionado.nome,naFila); ["i-nome","i-nasc","i-tel","i-resp"].forEach(id=>document.getElementById(id).value=""); go("s-confirmacao"); }
+  catch(e){ showLoader(false); showToast("❌ Erro ao salvar. Tente novamente."); }
+}
+
+async function salvarCadastroGeral(){
+  const nome=document.getElementById("cg-nome").value.trim();
+  const nasc=document.getElementById("cg-nasc").value;
+  const tel=document.getElementById("cg-tel").value.trim();
+  const resp=document.getElementById("cg-resp").value.trim();
+  const proj=document.getElementById("cg-proj").value;
+  if(!nome||!nasc||!tel){showToast("⚠️ Preencha nome, nascimento e WhatsApp");return;}
+  const reg={nome,nasc,tel,resp,projeto:proj||"A definir",projetoId:"geral",naFila:false,status:"cadastrado",timestamp:new Date().toISOString(),modo:MODO};
+  showLoader(true);
+  try{ await dbAdd("inscritos",reg); showLoader(false); prepararConfirmacao(nome,proj,false); ["cg-nome","cg-nasc","cg-tel","cg-resp"].forEach(id=>document.getElementById(id).value=""); document.getElementById("cg-proj").value=""; go("s-confirmacao"); }
+  catch(e){ showLoader(false); showToast("❌ Erro ao salvar. Tente novamente."); }
+}
+
+function prepararConfirmacao(nome,projeto,naFila){
+  document.getElementById("modo-salvo-info").innerHTML=MODO==="firebase"?`<span style="color:#166534">☁️ Dados salvos na nuvem com sucesso.</span>`:`<span style="color:#1D4ED8">📱 Dados salvos neste dispositivo.</span>`;
+  const msg=naFila?`Olá! Me chamo *${nome}* e me cadastrei no app da Associação Veneza. Tenho interesse no projeto *${projeto||"a definir"}* e entrei na lista de espera. Aguardo uma vaga! 🙏`:`Olá! Me chamo *${nome}* e acabei de me inscrever no projeto *${projeto||"a definir"}* pelo app da Associação Veneza. Pode confirmar minha vaga? 😊`;
+  document.getElementById("btn-wpp-confirma").onclick=()=>window.open(`https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(msg)}`,"_blank");
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🔐  LOGIN / LOGOUT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function fazerLogin(){
+  const u=document.getElementById("login-user").value.trim();
+  const p=document.getElementById("login-pass").value;
+  const admin=getAdmin();
+  if(u===admin.user && p===admin.pass){ go("s-admin"); adminTab("dash"); }
+  else{ showToast("❌ Usuário ou senha incorretos"); }
+}
+function fazerLogout(){ go("s-home"); }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📊  ADMIN — ABAS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function adminTab(tab){
+  ["dash","inscritos","presenca","espera","config"].forEach(t=>{ document.getElementById("t-"+t).classList.remove("active"); });
+  document.getElementById("t-"+tab).classList.add("active");
+  const c=document.getElementById("admin-content");
+  c.innerHTML=`<p style="color:#999;font-size:13px;padding:16px 0">Carregando...</p>`;
+  if(tab==="dash") renderDash(c);
+  else if(tab==="inscritos") renderInscritos(c);
+  else if(tab==="presenca") renderPresenca(c);
+  else if(tab==="espera") renderEspera(c);
+  else renderConfig(c);
+}
+
+async function renderDash(c){
+  const [ins,esp]=await Promise.all([dbGetAll("inscritos"),dbGetAll("espera")]);
+  const inicioMes=new Date(); inicioMes.setDate(1); inicioMes.setHours(0,0,0,0);
+  const novosMes=ins.filter(i=>i.timestamp&&new Date(i.timestamp)>=inicioMes);
+  c.innerHTML=`
+    ${bannerModo()}
+    <div class="section-title">Visão geral</div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-icon">👥</div><div class="stat-val">${ins.length}</div><div class="stat-lbl">Inscritos</div></div>
+      <div class="stat"><div class="stat-icon">🆕</div><div class="stat-val">${novosMes.length}</div><div class="stat-lbl">Novos este mês</div></div>
+      <div class="stat"><div class="stat-icon">⏳</div><div class="stat-val">${esp.length}</div><div class="stat-lbl">Em espera</div></div>
+      <div class="stat"><div class="stat-icon">🎯</div><div class="stat-val">${PROJETOS.length}</div><div class="stat-lbl">Projetos</div></div>
+    </div>
+    <div class="section-title">Ocupação dos projetos</div>
+    <div class="card">
+      ${PROJETOS.map(p=>{const pct=Math.round(p.ocupadas/p.vagas*100);return`
+        <div style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:600">${p.icon} ${p.nome}</span><span style="font-size:11px;color:#888">${p.ocupadas}/${p.vagas}</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct>=100?"var(--red)":"var(--y)"}"></div></div>
+        </div>`;}).join("")}
+    </div>
+    <div class="section-title">Últimos cadastros</div>
+    <div class="card">
+      ${ins.slice(0,5).map(i=>`
+        <div class="row-item">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="avatar">${iniciais(i.nome)}</div>
+            <div><div class="card-title" style="font-size:13px">${i.nome}</div><div class="card-sub">${i.projeto}</div></div>
+          </div>
+          <span class="badge badge-green" style="font-size:9px">Ativo</span>
+        </div>`).join("")||`<p style="color:#999;font-size:13px;padding:8px 0">Nenhum inscrito ainda.</p>`}
+    </div>`;
+}
+
+async function renderInscritos(c){
+  const ins=await dbGetAll("inscritos"); window._ins=ins;
+  c.innerHTML=`
+    ${bannerModo()}
+    <input type="text" id="busca" placeholder="Buscar nome ou projeto..." style="width:100%;border:1.5px solid var(--border);border-radius:10px;padding:9px 12px;font-size:13px;font-family:var(--font);margin-bottom:12px" oninput="filtrar()">
+    <div id="lista-ins">${htmlIns(ins)}</div>`;
+}
+function filtrar(){ const q=document.getElementById("busca").value.toLowerCase(); document.getElementById("lista-ins").innerHTML=htmlIns(window._ins.filter(i=>i.nome.toLowerCase().includes(q)||i.projeto.toLowerCase().includes(q))); }
+function htmlIns(lista){
+  if(!lista.length) return`<p style="color:#999;font-size:13px;padding:16px 0;text-align:center">Nenhum resultado.</p>`;
+  return`<div class="card">${lista.map(i=>`
+    <div class="row-item">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar">${iniciais(i.nome)}</div>
+        <div><div class="card-title" style="font-size:13px">${i.nome}</div><div class="card-sub">${i.projeto} · ${calcIdade(i.nasc)} anos</div></div>
+      </div>
+      <a href="https://wa.me/55${i.tel.replace(/\D/g,"")}" target="_blank" style="text-decoration:none"><button class="btn-sm yellow">📱</button></a>
+    </div>`).join("")}</div>`;
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ✅  PRESENÇA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function renderPresenca(c){
+  const presencas = LS.getObj("presencas", {});
+  const hoje = new Date();
+  const diasMes = new Date(hoje.getFullYear(), hoje.getMonth()+1, 0).getDate();
+  const nomeMes = hoje.toLocaleDateString("pt-BR",{month:"long",year:"numeric"});
+
+  c.innerHTML = `
+    ${bannerModo()}
+    <div class="section-title">Registro de presença — ${nomeMes}</div>
+    <p style="font-size:12px;color:#888;margin-bottom:12px">Toque nos dias para marcar presença 🟡 ou falta 🔴</p>
+    ${PROJETOS.map(p=>{
+      const pProjeto = presencas[p.id] || {};
+      const dias = Array.from({length:diasMes},(_,i)=>i+1);
+      return `
+        <div class="card" style="margin-bottom:10px">
+          <div class="card-title">${p.icon} ${p.nome}</div>
+          <div class="card-sub" style="margin-bottom:8px">${p.horario}</div>
+          <div class="presenca-grid">
+            ${dias.map(d=>{
+              const key=`${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+              const status = pProjeto[key] || "";
+              const isFuture = d > hoje.getDate();
+              return `<button class="presenca-dia ${status}" onclick="${isFuture?"":`togglePresenca('${p.id}','${key}',this)`}" style="${isFuture?"opacity:.3;cursor:default":""}" title="${key}">${d}</button>`;
+            }).join("")}
+          </div>
+          <div style="display:flex;gap:8px;margin-top:10px;font-size:11px;color:#888">
+            <span>🟡 Presente: ${Object.values(pProjeto).filter(v=>v==="presente").length}</span>
+            <span>🔴 Falta: ${Object.values(pProjeto).filter(v=>v==="falta").length}</span>
+          </div>
+        </div>`;
+    }).join("")}`;
+}
+
+function togglePresenca(projetoId, key, btn){
+  const presencas = LS.getObj("presencas", {});
+  if(!presencas[projetoId]) presencas[projetoId] = {};
+  const atual = presencas[projetoId][key] || "";
+  const proximo = atual===""?"presente": atual==="presente"?"falta":"";
+  if(proximo==="") delete presencas[projetoId][key];
+  else presencas[projetoId][key] = proximo;
+  LS.setObj("presencas", presencas);
+  btn.className = "presenca-dia " + proximo;
+  const card = btn.closest(".card");
+  const proj = LS.getObj("presencas",{})[projetoId]||{};
+  card.querySelectorAll(".card-sub")[1] && (card.querySelectorAll("div[style*='gap:8px']")[0].innerHTML=`<span>🟡 Presente: ${Object.values(proj).filter(v=>v==="presente").length}</span><span>🔴 Falta: ${Object.values(proj).filter(v=>v==="falta").length}</span>`);
+}
+
+async function renderEspera(c){
+  const esp=await dbGetAll("espera");
+  c.innerHTML=`
+    ${bannerModo()}
+    <div class="notice"><p>Quando abrir vaga, avise o participante pelo WhatsApp. Ele entra na ordem da fila.</p></div>
+    <div class="section-title">Lista de espera (${esp.length})</div>
+    ${esp.length?`<div class="card">${esp.map((i,idx)=>`
+      <div class="row-item">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="avatar" style="background:#EEE;color:#888;font-size:11px">#${idx+1}</div>
+          <div><div class="card-title" style="font-size:13px">${i.nome}</div><div class="card-sub">${i.projeto}</div></div>
+        </div>
+        <a href="https://wa.me/55${i.tel.replace(/\D/g,"")}" target="_blank" style="text-decoration:none"><button class="btn-sm yellow">Avisar</button></a>
+      </div>`).join("")}</div>`:`<p style="color:#999;font-size:13px;padding:16px 0;text-align:center">Nenhum na fila. ✅</p>`}`;
+}
+
+function renderConfig(c){
+  const admin = getAdmin();
+  const ultimo = LS.getObj("ultimo_relatorio", null);
+  const emailjsOk = Object.values(EMAILJS).every(v => v !== "COLE_AQUI");
+  c.innerHTML=`
+    ${bannerModo()}
+    <div class="section-title">Conta administrativa</div>
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-title">👤 ${admin.user}</div>
+      <div class="card-sub">📧 ${admin.email}</div>
+    </div>
+    <button class="btn btn-outline" onclick="go('s-alterar-senha')" style="margin-bottom:16px">🔒 Alterar senha</button>
+
+    <div class="section-title">Relatório mensal por e-mail</div>
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-sub">Enviado automaticamente todo dia 1º do mês para <strong>${admin.email}</strong></div>
+      <div class="card-sub" style="margin-top:6px">Contém: presença, novos cadastros, fila de espera e eventos do mês.</div>
+      ${ultimo?`<div class="card-sub" style="margin-top:6px;color:#166534">✅ Último envio: ${new Date(ultimo).toLocaleDateString("pt-BR")}</div>`:""}
+      ${!emailjsOk?`<div class="card-sub" style="margin-top:6px;color:#854D0E">⚠️ EmailJS não configurado — relatório será exportado como arquivo.</div>`:""}
+    </div>
+    <button class="btn btn-primary" onclick="enviarAgora()" style="margin-bottom:8px">📧 Enviar relatório agora</button>
+
+    <div class="section-title">Sistema</div>
+    <div class="card">
+      <div class="row-item"><span style="font-size:13px">Banco de dados</span><span class="badge ${MODO==="firebase"?"badge-green":"badge-yellow"}">${MODO==="firebase"?"Firebase":"Local"}</span></div>
+      <div class="row-item"><span style="font-size:13px">EmailJS</span><span class="badge ${emailjsOk?"badge-green":"badge-yellow"}">${emailjsOk?"Configurado":"Pendente"}</span></div>
+      <div class="row-item"><span style="font-size:13px">Versão</span><span style="font-size:12px;color:#888">1.0.0</span></div>
+    </div>`;
+}
+
+async function enviarAgora(){
+  showLoader(true);
+  await enviarRelatorioMensal(true);
+  showLoader(false);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🚀  INIT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+renderProjetos();
+verificarRelatorioAutomatico();
+</script>
+</body>
+</html>
