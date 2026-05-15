@@ -704,7 +704,7 @@ async function renderRelatorioProfessor(c){
           <span class="badge ${p>f?"badge-green":"badge-red"}">${p+f>0?Math.round(p/(p+f)*100):0}%</span>
         </div>`;}).join("")||`<p style="color:#999;font-size:13px;padding:8px 0">Nenhum aluno.</p>`}
     </div>
-    <button class="btn btn-primary" onclick="exportarXLSX()" style="margin-top:4px">📊 Exportar Excel / Google Sheets</button>\`;
+    <button class="btn btn-primary" onclick="exportarXLSX()" style="margin-top:4px">📊 Exportar Excel / Google Sheets</button>`;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -1116,7 +1116,7 @@ async function verDetalhesProjeto(projetoId){
             ${a.dev.dificuldade?`<div style="margin-bottom:4px"><strong>Dificuldades:</strong> ${a.dev.dificuldade}</div>`:""}
             ${a.dev.comportamento?`<div><strong>Comportamento:</strong> ${a.dev.comportamento}</div>`:""}
           </div>`:""}`).join("")}</div>`}
-    <button class="btn btn-primary" onclick="exportarXLSXAdmin('${projetoId}')" style="margin-top:12px">📊 Exportar Excel / Google Sheets</button>\`;
+    <button class="btn btn-primary" onclick="exportarXLSXAdmin('${projetoId}')" style="margin-top:12px">📊 Exportar Excel / Google Sheets</button>`;
 }
 
 
