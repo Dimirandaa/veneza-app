@@ -85,6 +85,12 @@ body{font-family:var(--font);background:var(--blk);min-height:100vh;display:flex
 .presenca-btn{width:36px;height:36px;border-radius:50%;border:none;font-size:16px;cursor:pointer;transition:transform .15s}
 .presenca-btn:active{transform:scale(.9)}
 .dev-card{background:var(--wht);border-radius:12px;border:1px solid var(--border);padding:12px 14px;margin-bottom:8px}
+.pass-wrap{position:relative;width:100%}
+.pass-wrap input{padding-right:44px;width:100%;border:1.5px solid var(--border);border-radius:10px;padding-left:13px;font-size:14px;font-family:var(--font);transition:border-color .2s}
+.pass-wrap input:focus{outline:none;border-color:var(--y)}
+.pass-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:16px;color:var(--mgray);padding:0}
+.caps-warn{display:none;font-size:11px;color:#854D0E;background:#FEF9C3;border:1px solid #F5C400;border-radius:8px;padding:5px 10px;margin-top:4px}
+.caps-warn.show{display:block}
 @media(max-width:420px){body{align-items:flex-start}.app{min-height:100dvh}}
 </style>
 </head>
@@ -172,7 +178,14 @@ body{font-family:var(--font);background:var(--blk);min-height:100vh;display:flex
       <p class="login-sub">Acesso administrativo</p>
       <div style="width:100%;max-width:320px">
         <div class="field"><label>Usuário</label><input type="text" id="login-user" placeholder="admin" autocomplete="username"></div>
-        <div class="field"><label>Senha</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()"></div>
+        <div class="field">
+          <label>Senha</label>
+          <div class="pass-wrap">
+            <input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')fazerLogin()" onkeyup="checkCaps(event,'caps-admin')">
+            <button class="pass-toggle" onclick="togglePass('login-pass',this)" type="button">👁️</button>
+          </div>
+          <div class="caps-warn" id="caps-admin">⚠️ CAPS LOCK ativado</div>
+        </div>
         <button class="btn btn-primary" onclick="fazerLogin()">Entrar</button>
         <button class="btn" onclick="go('s-recuperar')" style="background:none;color:#F5C400;font-size:13px;margin-top:8px">Esqueci minha senha</button>
         <button class="btn" onclick="go('s-home')" style="background:none;color:#555;font-size:13px;margin-top:4px">← Voltar ao app</button>
@@ -188,7 +201,14 @@ body{font-family:var(--font);background:var(--blk);min-height:100vh;display:flex
       <p class="login-sub">Acesse com suas credenciais</p>
       <div style="width:100%;max-width:320px">
         <div class="field"><label>Usuário</label><input type="text" id="prof-user" placeholder="professor1" autocomplete="username"></div>
-        <div class="field"><label>Senha</label><input type="password" id="prof-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginProfessor()"></div>
+        <div class="field">
+          <label>Senha</label>
+          <div class="pass-wrap">
+            <input type="password" id="prof-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')loginProfessor()" onkeyup="checkCaps(event,'caps-prof')">
+            <button class="pass-toggle" onclick="togglePass('prof-pass',this)" type="button">👁️</button>
+          </div>
+          <div class="caps-warn" id="caps-prof">⚠️ CAPS LOCK ativado</div>
+        </div>
         <button class="btn btn-primary" onclick="loginProfessor()">Entrar</button>
         <button class="btn" onclick="go('s-home')" style="background:none;color:#555;font-size:13px;margin-top:4px">← Voltar ao app</button>
       </div>
@@ -259,9 +279,63 @@ body{font-family:var(--font);background:var(--blk);min-height:100vh;display:flex
 
 </div>
 
+  <!-- ══ NOVO PROFESSOR (ADMIN) ══ -->
+  <div class="screen" id="s-novo-professor">
+    <div class="topbar"><button class="topbar-back" onclick="adminTab('professores')">← voltar</button><span class="topbar-title">Cadastrar professor</span></div>
+    <div class="content">
+      <div class="section-title">Dados do professor</div>
+      <div class="field"><label>Nome completo *</label><input type="text" id="np-nome" placeholder="Ex: Ana Silva"></div>
+      <div class="field"><label>Idade *</label><input type="number" id="np-idade" placeholder="Ex: 28"></div>
+      <div class="field"><label>Endereço</label><input type="text" id="np-endereco" placeholder="Ex: Rua das Flores, 123 - Jardim Itajaí"></div>
+      <div class="field"><label>Projeto *</label>
+        <select id="np-projeto">
+          <option value="">Selecione o projeto</option>
+          <option value="bale">Balé</option>
+          <option value="capoeira">Capoeira</option>
+          <option value="muaythai">Muay Thai</option>
+          <option value="reforco">Reforço Escolar</option>
+          <option value="danca">Dança ao ar livre</option>
+          <option value="brincar">Brincar e Desenvolver</option>
+        </select>
+      </div>
+      <div class="field"><label>Usuário de acesso *</label><input type="text" id="np-user" placeholder="Ex: ana.silva"></div>
+      <div class="field">
+        <label>Senha *</label>
+        <div class="pass-wrap">
+          <input type="password" id="np-pass" placeholder="Mín. 8 chars, 1 maiúscula, 1 número" onkeyup="checkCaps(event,'caps-np')" oninput="validarSenhaInput('np-pass','np-hint')">
+          <button class="pass-toggle" onclick="togglePass('np-pass',this)" type="button">👁️</button>
+        </div>
+        <div class="caps-warn" id="caps-np">⚠️ CAPS LOCK ativado</div>
+        <div class="hint" id="np-hint"></div>
+      </div>
+      <button class="btn btn-primary" onclick="salvarNovoProfessor()">Cadastrar professor</button>
+    </div>
+  </div>
+
+  <!-- ══ NOVO PROJETO (ADMIN) ══ -->
+  <div class="screen" id="s-novo-projeto">
+    <div class="topbar"><button class="topbar-back" onclick="adminTab('dash')">← voltar</button><span class="topbar-title">Cadastrar projeto</span></div>
+    <div class="content">
+      <div class="section-title">Dados do projeto</div>
+      <div class="field"><label>Nome do projeto *</label><input type="text" id="proj-nome" placeholder="Ex: Violão"></div>
+      <div class="field"><label>Ícone (emoji)</label><input type="text" id="proj-icon" placeholder="Ex: 🎸" maxlength="2"></div>
+      <div class="field"><label>Horário</label><input type="text" id="proj-horario" placeholder="Ex: Ter e Qui · 17h–18h"></div>
+      <div class="field"><label>Público-alvo</label><input type="text" id="proj-publico" placeholder="Ex: Crianças 8–14 anos"></div>
+      <div class="field"><label>Total de vagas *</label><input type="number" id="proj-vagas" placeholder="Ex: 20"></div>
+      <button class="btn btn-primary" onclick="salvarNovoProjeto()">Cadastrar projeto</button>
+    </div>
+  </div>
+
+  <!-- ══ DETALHES DO PROJETO (ADMIN) ══ -->
+  <div class="screen" id="s-detalhe-projeto">
+    <div class="topbar"><button class="topbar-back" onclick="adminTab('dash')">← voltar</button><span class="topbar-title" id="detalhe-titulo">Projeto</span></div>
+    <div class="content" id="detalhe-content"></div>
+  </div>
+
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 
 <script>
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -473,7 +547,7 @@ async function alterarSenha(){
 function loginProfessor(){
   const u=document.getElementById("prof-user").value.trim();
   const p=document.getElementById("prof-pass").value;
-  const prof=PROFESSORES.find(x=>x.user===u&&x.pass===p);
+  const prof=getProfessores().find(x=>x.user===u&&x.pass===p);
   if(!prof){showToast("❌ Usuário ou senha incorretos");return;}
   profLogado=prof;
   document.getElementById("prof-topbar-title").textContent=`${prof.icon||""}${prof.projeto}`;
@@ -589,7 +663,7 @@ function salvarDev(alunoId,projetoId){
   const devs=LS.getObj("dev_"+projetoId,{});
   devs[alunoId]={dificuldade:dif,comportamento:comp,atualizadoEm:new Date().toISOString()};
   LS.setObj("dev_"+projetoId,devs);
-  showToast("✅ Desenvolvimento salvo!");
+  showToast("✅ Salvo com sucesso!");
 }
 
 /* ── RELATÓRIO PROFESSOR (XML) ── */
@@ -630,56 +704,111 @@ async function renderRelatorioProfessor(c){
           <span class="badge ${p>f?"badge-green":"badge-red"}">${p+f>0?Math.round(p/(p+f)*100):0}%</span>
         </div>`;}).join("")||`<p style="color:#999;font-size:13px;padding:8px 0">Nenhum aluno.</p>`}
     </div>
-    <button class="btn btn-primary" onclick="exportarXML()" style="margin-top:4px">📄 Exportar XML (Excel/Sheets)</button>`;
+    <button class="btn btn-primary" onclick="exportarXLSX()" style="margin-top:4px">📊 Exportar Excel / Google Sheets</button>\`;
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-   📄  EXPORTAR XML
+   📊  EXPORTAR XLSX
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
-async function exportarXML(){
-  const inscritos=await dbGetAll("inscritos");
-  const alunos=inscritos.filter(i=>i.projetoId===profLogado.projetoId&&i.status==="ativo");
-  const mes=mesAtual();
-  const devs=LS.getObj("dev_"+profLogado.projetoId,{});
-  const agora=new Date().toLocaleDateString("pt-BR");
+async function exportarXLSX(profOverride){
+  const prof = profOverride || profLogado;
+  if(!prof){ showToast("⚠️ Nenhum projeto selecionado"); return; }
 
-  let rows=alunos.map(a=>{
-    let p=0,f=0;
-    for(let d=1;d<=31;d++){const key=`chamada_${profLogado.projetoId}_${mes}-${String(d).padStart(2,"0")}`;const ch=LS.getObj(key,{});if(ch[a.id]==="presente")p++;if(ch[a.id]==="falta")f++;}
-    const dev=devs[a.id]||{dificuldade:"",comportamento:""};
-    const freq=p+f>0?Math.round(p/(p+f)*100):0;
-    return`    <Aluno>
-      <Nome>${a.nome}</Nome>
-      <Idade>${calcIdade(a.nasc)}</Idade>
-      <Projeto>${profLogado.projeto}</Projeto>
-      <Presencas>${p}</Presencas>
-      <Faltas>${f}</Faltas>
-      <Frequencia_Pct>${freq}</Frequencia_Pct>
-      <Dificuldades>${dev.dificuldade||"Não informado"}</Dificuldades>
-      <Comportamento>${dev.comportamento||"Não informado"}</Comportamento>
-    </Aluno>`;
-  }).join("\n");
+  const inscritos = await dbGetAll("inscritos");
+  const alunos = inscritos.filter(i=>i.projetoId===prof.projetoId&&i.status==="ativo");
+  const mes = mesAtual();
+  const devs = LS.getObj("dev_"+prof.projetoId, {});
+  const agora = new Date().toLocaleDateString("pt-BR");
 
-  const xml=`<?xml version="1.0" encoding="UTF-8"?>
-<RelatorioVeneza>
-  <Cabecalho>
-    <Associacao>Associação Veneza</Associacao>
-    <Projeto>${profLogado.projeto}</Projeto>
-    <Professor>${profLogado.nome}</Professor>
-    <Periodo>${nomeMesAtual()}</Periodo>
-    <GeradoEm>${agora}</GeradoEm>
-    <TotalAlunos>${alunos.length}</TotalAlunos>
-  </Cabecalho>
-  <Alunos>
-${rows}
-  </Alunos>
-</RelatorioVeneza>`;
+  // Monta dados para planilha — aba principal
+  const dadosAlunos = alunos.map(a=>{
+    let p=0, f=0;
+    for(let d=1;d<=31;d++){
+      const key=`chamada_${prof.projetoId}_${mes}-${String(d).padStart(2,"0")}`;
+      const ch=LS.getObj(key,{});
+      if(ch[a.id]==="presente") p++;
+      if(ch[a.id]==="falta") f++;
+    }
+    const dev = devs[a.id]||{dificuldade:"",comportamento:""};
+    const freq = p+f>0?Math.round(p/(p+f)*100):0;
+    return {
+      "Nome":           a.nome,
+      "Idade":          calcIdade(a.nasc),
+      "WhatsApp":       a.tel||"",
+      "Projeto":        prof.projeto,
+      "Presenças":      p,
+      "Faltas":         f,
+      "Frequência (%)": freq,
+      "Dificuldades":   dev.dificuldade||"",
+      "Comportamento":  dev.comportamento||""
+    };
+  });
 
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(new Blob([xml],{type:"application/xml;charset=utf-8"}));
-  a.download=`relatorio-${profLogado.projetoId}-${mes}.xml`;
-  a.click();
-  showToast("✅ XML exportado! Abra no Excel ou Google Sheets.");
+  // Monta dados de presença diária — aba de chamada
+  const dadosChamada = [];
+  for(let d=1;d<=31;d++){
+    const data=`${mes}-${String(d).padStart(2,"0")}`;
+    const key=`chamada_${prof.projetoId}_${data}`;
+    const ch=LS.getObj(key,{});
+    const temRegistro=Object.keys(ch).length>0;
+    if(!temRegistro) continue;
+    alunos.forEach(a=>{
+      if(ch[a.id]){
+        dadosChamada.push({
+          "Data":    data,
+          "Aluno":   a.nome,
+          "Status":  ch[a.id]==="presente"?"Presente":"Falta",
+          "Projeto": prof.projeto
+        });
+      }
+    });
+  }
+
+  // Cria workbook com duas abas
+  const wb = XLSX.utils.book_new();
+
+  // Aba 1 — Resumo mensal
+  const ws1 = XLSX.utils.json_to_sheet(
+    dadosAlunos.length > 0 ? dadosAlunos : [{"Info":"Nenhum aluno inscrito"}]
+  );
+  // Largura das colunas
+  ws1["!cols"] = [
+    {wch:25},{wch:8},{wch:16},{wch:20},{wch:10},{wch:8},{wch:14},{wch:35},{wch:35}
+  ];
+  XLSX.utils.book_append_sheet(wb, ws1, "Resumo Mensal");
+
+  // Aba 2 — Chamada diária
+  const ws2 = XLSX.utils.json_to_sheet(
+    dadosChamada.length > 0 ? dadosChamada : [{"Info":"Nenhuma chamada registrada"}]
+  );
+  ws2["!cols"] = [{wch:14},{wch:25},{wch:12},{wch:20}];
+  XLSX.utils.book_append_sheet(wb, ws2, "Chamada Diária");
+
+  // Aba 3 — Cabeçalho / informações
+  const ws3 = XLSX.utils.aoa_to_sheet([
+    ["RELATÓRIO MENSAL — ASSOCIAÇÃO VENEZA"],
+    [""],
+    ["Projeto:",    prof.projeto],
+    ["Professor:",  prof.nome],
+    ["Período:",    nomeMesAtual()],
+    ["Gerado em:",  agora],
+    ["Total de alunos:", alunos.length],
+    ["Total de presenças:", dadosAlunos.reduce((s,a)=>s+a["Presenças"],0)],
+    ["Total de faltas:",    dadosAlunos.reduce((s,a)=>s+a["Faltas"],0)],
+  ]);
+  ws3["!cols"] = [{wch:22},{wch:30}];
+  XLSX.utils.book_append_sheet(wb, ws3, "Informações");
+
+  // Baixa o arquivo
+  XLSX.writeFile(wb, `relatorio-veneza-${prof.projetoId}-${mes}.xlsx`);
+  showToast("✅ Excel exportado! Abra no Google Sheets ou Excel.");
+}
+
+async function exportarXLSXAdmin(projetoId){
+  const prof = getProfessores().find(p=>p.projetoId===projetoId);
+  const proj = PROJETOS.find(p=>p.id===projetoId);
+  const profTemp = prof || {projetoId, projeto: proj?.nome||projetoId, nome:"Admin"};
+  await exportarXLSX(profTemp);
 }
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -716,8 +845,10 @@ async function renderDash(c){
         <div style="margin-bottom:12px">
           <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:13px;font-weight:600">${p.icon} ${p.nome}</span><span style="font-size:11px;color:#888">${p.ocupadas}/${p.vagas}</span></div>
           <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${pct>=100?"#EF4444":"var(--y)"}"></div></div>
+          <button style="font-size:10px;color:#888;background:none;border:none;cursor:pointer;padding:4px 0;text-align:left" onclick="verDetalhesProjeto('${p.id}')">Ver detalhes →</button>
         </div>`;}).join("")}
     </div>
+    <button class="btn btn-outline" onclick="go('s-novo-projeto')" style="margin-bottom:12px">➕ Cadastrar novo projeto</button>
     <div class="section-title">Últimos cadastros</div>
     <div class="card">
       ${ins.slice(0,5).map(i=>`
@@ -752,13 +883,15 @@ function htmlIns(lista){
 }
 
 function renderProfessores(c){
+  const lista = getProfessores();
   c.innerHTML=`
     ${bannerModo()}
-    <div class="section-title">Professores cadastrados</div>
-    <div class="notice"><p>👋 Credenciais de teste. Substitua pelos dados reais após alinhamento com a Fabiana.</p></div>
-    <div class="card">
-      ${PROFESSORES.map(p=>`
-        <div class="row-item">
+    <button class="btn btn-primary" onclick="go('s-novo-professor')" style="margin-bottom:12px">➕ Cadastrar novo professor</button>
+    <div class="section-title">Professores cadastrados (${lista.length})</div>
+    ${lista.length===0?`<p style="color:#999;font-size:13px;padding:16px 0;text-align:center">Nenhum professor cadastrado ainda.</p>`
+    :`<div class="card">${lista.map((p,idx)=>`
+      <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
           <div style="display:flex;align-items:center;gap:10px">
             <div class="avatar purple">${iniciais(p.nome)}</div>
             <div>
@@ -766,11 +899,24 @@ function renderProfessores(c){
               <div class="card-sub">${p.projeto}</div>
             </div>
           </div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-            <span class="badge badge-purple" style="margin-top:0">${p.user}</span>
-          </div>
-        </div>`).join("")}
-    </div>`;
+          <button class="btn-sm red" onclick="excluirProfessor(${idx})">🗑️</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;color:#888">
+          <div>👤 <strong>${p.user}</strong></div>
+          <div>🎂 ${p.idade||"—"} anos</div>
+          ${p.endereco?`<div style="grid-column:1/-1">📍 ${p.endereco}</div>`:""}
+          <div>📅 ${p.cadastradoEm?new Date(p.cadastradoEm).toLocaleDateString("pt-BR"):"Teste"}</div>
+        </div>
+      </div>`).join("")}</div>`}`;
+}
+
+function excluirProfessor(idx){
+  if(!confirm("Confirma exclusão deste professor?")) return;
+  const lista = getProfessores();
+  lista.splice(idx,1);
+  setProfessores(lista);
+  showToast("✅ Professor removido.");
+  adminTab("professores");
 }
 
 async function renderEspera(c){
@@ -814,6 +960,165 @@ function renderConfig(c){
       <div class="row-item"><span style="font-size:13px">Versão</span><span style="font-size:12px;color:#888">1.1.0</span></div>
     </div>`;
 }
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🔒  PASSWORD HELPERS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function togglePass(inputId, btn){
+  const inp = document.getElementById(inputId);
+  if(inp.type === "password"){ inp.type = "text"; btn.textContent = "🙈"; }
+  else { inp.type = "password"; btn.textContent = "👁️"; }
+}
+function checkCaps(e, warnId){
+  const warn = document.getElementById(warnId);
+  if(!warn) return;
+  if(e.getModifierState && e.getModifierState("CapsLock")) warn.classList.add("show");
+  else warn.classList.remove("show");
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   👨‍🏫  GERENCIAR PROFESSORES (ADMIN)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function getProfessores(){
+  return LS.getObj("professores_cadastrados", PROFESSORES);
+}
+function setProfessores(lista){
+  LS.setObj("professores_cadastrados", lista);
+}
+
+function salvarNovoProfessor(){
+  const nome = document.getElementById("np-nome").value.trim();
+  const idade = document.getElementById("np-idade").value.trim();
+  const endereco = document.getElementById("np-endereco").value.trim();
+  const projetoId = document.getElementById("np-projeto").value;
+  const user = document.getElementById("np-user").value.trim();
+  const pass = document.getElementById("np-pass").value;
+
+  if(!nome||!idade||!projetoId||!user||!pass){ showToast("⚠️ Preencha todos os campos obrigatórios"); return; }
+  if(!senhaValida(pass)){ showToast("⚠️ Senha não atende aos requisitos"); return; }
+
+  const proj = PROJETOS.find(p=>p.id===projetoId);
+  const lista = getProfessores();
+
+  if(lista.find(p=>p.user===user)){ showToast("❌ Usuário já existe"); return; }
+
+  const novo = {
+    user, pass,
+    nome, idade: parseInt(idade), endereco,
+    projetoId, projeto: proj ? proj.nome : projetoId,
+    cadastradoEm: new Date().toISOString()
+  };
+  lista.push(novo);
+  setProfessores(lista);
+
+  ["np-nome","np-idade","np-endereco","np-user","np-pass"].forEach(id=>document.getElementById(id).value="");
+  document.getElementById("np-projeto").value="";
+  showToast("✅ Professor cadastrado com sucesso!");
+  setTimeout(()=>adminTab("professores"), 1500);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   📁  GERENCIAR PROJETOS (ADMIN)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function getProjetos(){
+  return LS.getObj("projetos_cadastrados", PROJETOS);
+}
+function setProjetos(lista){
+  LS.setObj("projetos_cadastrados", lista);
+}
+
+function salvarNovoProjeto(){
+  const nome = document.getElementById("proj-nome").value.trim();
+  const icon = document.getElementById("proj-icon").value.trim() || "📌";
+  const horario = document.getElementById("proj-horario").value.trim();
+  const publico = document.getElementById("proj-publico").value.trim();
+  const vagas = parseInt(document.getElementById("proj-vagas").value);
+
+  if(!nome||!vagas){ showToast("⚠️ Nome e vagas são obrigatórios"); return; }
+
+  const lista = getProjetos();
+  const id = nome.toLowerCase().replace(/\s+/g,"-").replace(/[^a-z0-9-]/g,"");
+
+  if(lista.find(p=>p.id===id)){ showToast("❌ Projeto com esse nome já existe"); return; }
+
+  lista.push({ id, nome, icon, horario, publico, vagas, ocupadas: 0 });
+  setProjetos(lista);
+
+  ["proj-nome","proj-icon","proj-horario","proj-publico","proj-vagas"].forEach(id=>document.getElementById(id).value="");
+  showToast("✅ Projeto cadastrado com sucesso!");
+  setTimeout(()=>adminTab("dash"), 1500);
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   🔍  DETALHE DO PROJETO (ADMIN)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+async function verDetalhesProjeto(projetoId){
+  const proj = PROJETOS.find(p=>p.id===projetoId);
+  if(!proj) return;
+  document.getElementById("detalhe-titulo").textContent = proj.icon+" "+proj.nome;
+  const c = document.getElementById("detalhe-content");
+  c.innerHTML = `<p style="color:#999;font-size:13px;padding:16px 0">Carregando...</p>`;
+  go("s-detalhe-projeto");
+
+  const inscritos = await dbGetAll("inscritos");
+  const alunos = inscritos.filter(i=>i.projetoId===projetoId&&i.status==="ativo");
+  const devs = LS.getObj("dev_"+projetoId, {});
+  const mes = mesAtual();
+
+  // Calcula presenças do mês
+  const resumoAlunos = alunos.map(a=>{
+    let p=0, f=0;
+    for(let d=1;d<=31;d++){
+      const key=`chamada_${projetoId}_${mes}-${String(d).padStart(2,"0")}`;
+      const ch=LS.getObj(key,{});
+      if(ch[a.id]==="presente") p++;
+      if(ch[a.id]==="falta") f++;
+    }
+    const dev = devs[a.id]||{dificuldade:"",comportamento:""};
+    return{...a, presencas:p, faltas:f, freq:p+f>0?Math.round(p/(p+f)*100):0, dev};
+  });
+
+  const profProj = getProfessores().find(p=>p.projetoId===projetoId);
+  const totalP = resumoAlunos.reduce((s,a)=>s+a.presencas,0);
+  const totalF = resumoAlunos.reduce((s,a)=>s+a.faltas,0);
+
+  c.innerHTML = `
+    <div class="card" style="border-color:#F5C400;border-width:1.5px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="card-title">${proj.icon} ${proj.nome}</div><div class="card-sub">${proj.horario}</div></div>
+        <span class="badge badge-${proj.vagas-proj.ocupadas>0?"green":"red"}">${proj.vagas-proj.ocupadas} vagas livres</span>
+      </div>
+      ${profProj?`<div class="card-sub" style="margin-top:6px">👨‍🏫 Professor: <strong>${profProj.nome}</strong></div>`:""}
+    </div>
+    <div class="stat-grid">
+      <div class="stat"><div class="stat-icon">👥</div><div class="stat-val">${alunos.length}</div><div class="stat-lbl">Alunos</div></div>
+      <div class="stat"><div class="stat-icon">✅</div><div class="stat-val">${totalP}</div><div class="stat-lbl">Presenças/mês</div></div>
+      <div class="stat"><div class="stat-icon">❌</div><div class="stat-val">${totalF}</div><div class="stat-lbl">Faltas/mês</div></div>
+      <div class="stat"><div class="stat-icon">📊</div><div class="stat-val">${totalP+totalF>0?Math.round(totalP/(totalP+totalF)*100):0}%</div><div class="stat-lbl">Frequência</div></div>
+    </div>
+    <div class="section-title">Alunos — Presença e Desenvolvimento</div>
+    ${resumoAlunos.length===0?`<p style="color:#999;font-size:13px;padding:8px 0">Nenhum aluno inscrito.</p>`
+    :`<div class="card">${resumoAlunos.map(a=>`
+      <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="avatar">${iniciais(a.nome)}</div>
+            <div><div class="card-title" style="font-size:13px">${a.nome}</div><div class="card-sub">${calcIdade(a.nasc)} anos</div></div>
+          </div>
+          <span class="badge badge-${a.freq>=75?"green":a.freq>=50?"yellow":"red"}">${a.freq}%</span>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <div style="flex:1;background:#DCFCE7;border-radius:8px;padding:6px;text-align:center"><div style="font-size:14px;font-weight:700;color:#166534">${a.presencas}</div><div style="font-size:10px;color:#166534">Presenças</div></div>
+          <div style="flex:1;background:#FEE2E2;border-radius:8px;padding:6px;text-align:center"><div style="font-size:14px;font-weight:700;color:#991B1B">${a.faltas}</div><div style="font-size:10px;color:#991B1B">Faltas</div></div>
+        </div>
+        ${a.dev.dificuldade||a.dev.comportamento?`
+          <div style="background:#F7F7F7;border-radius:8px;padding:8px;font-size:11px">
+            ${a.dev.dificuldade?`<div style="margin-bottom:4px"><strong>Dificuldades:</strong> ${a.dev.dificuldade}</div>`:""}
+            ${a.dev.comportamento?`<div><strong>Comportamento:</strong> ${a.dev.comportamento}</div>`:""}
+          </div>`:""}`).join("")}</div>`}
+    <button class="btn btn-primary" onclick="exportarXLSXAdmin('${projetoId}')" style="margin-top:12px">📊 Exportar Excel / Google Sheets</button>\`;
+}
+
 
 /* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
    🚀  INIT
